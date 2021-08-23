@@ -25,66 +25,77 @@ contract GameKeys is ERC721Enumerable, ERC721URIStorage {
         string timeStamp;
     }
     
+    uint256 private _rate; 
+    
     mapping(uint256 => uint256) private _gamePrice; //price by id
     mapping(address => uint256) private _creatorBalances; //game creator balances
     mapping(uint256 => Games) private _gameInfos; //game struct by id
     mapping(uint256 => address) private _gameCreator; 
     //mapping(bytes32 => uint256) private _gameHash;
-    mapping(uint256 => bool) private _gameRegistered;
+    mapping(uint256 => bool) private _isGameRegistered;
 
-    //todo events
+    // Events
+    event GameBenefitsWithdrew(address indexed creator, uint256 profitAmount);
+    event GameBought(address indexed buyer, uint256 gameId, uint256 newLicenseId, uint256 price);
+    event NewGameRegistered(address indexed creator, uint256 newGameId, uint256 priceInFinney);
+    
+    // modifier 
 
-    constructor() ERC721("GameKeys", "GMK") {}
+
+    constructor() ERC721("GameKeys", "GMK") {
+        _rate = 1e15;
+    }
     
     // Functions
 
-    function registerNewGame(Games memory nft, uint256 price_)  public returns (uint256) {
+    function registerNewGame(Games memory nft, uint256 price_)  public returns (bool) {
         //require(_gameHash[nft.gameHash] == 0, "GameKeys: This Game already exists");
         _gameIds.increment();
         uint256 newGameId = _gameIds.current();
         _gameCreator[newGameId] = msg.sender;
-        _gamePrice[newGameId] = price_;
+        uint256 priceInFinney = price_ * _rate;
+        _gamePrice[newGameId] = priceInFinney;
         _gameInfos[newGameId] = nft;
-        _gameRegistered[newGameId] = true;
-        return newGameId;
-        //todo emit
+        emit NewGameRegistered(msg.sender, newGameId, priceInFinney);
+        return _isGameRegistered[newGameId] = true;
     }
 
-    function buyGame(uint256 id) public payable {
-        //todo require _exists(id)
-        require(msg.value >= getPrice(id), "GameKeys: Sorry not enought ethers" );
+    function buyGame(uint256 gameId) public payable {
+        require(_isGameRegistered[gameId] == true, "GameKeys: Sorryy this game does not exists");
+        require(msg.value >= getPrice(gameId), "GameKeys: Sorry not enought ethers" );
         _licenseIds.increment();
-        uint256 amount = msg.value;
-        _creatorBalances[_gameCreator[id]] += amount;
+        uint256 price = msg.value;
+        _creatorBalances[_gameCreator[gameId]] += price;
         uint256 newLicenseId = _licenseIds.current();
         _mint(msg.sender, newLicenseId);
-        //todo emit
+        emit GameBought(msg.sender, gameId, newLicenseId, price);
     }
 
     //todo modifier(onlyCreator)/access control
-    function withdraw() public {
-        uint256 amount = _creatorBalances[msg.sender];
+    function withdraw(uint256 gameId) public {
+        require (msg.sender == _gameCreator[gameId], "GameKeys: Sorry only the game creator can withdraw this balance");
+        uint256 profitAmount = _creatorBalances[msg.sender];
         _creatorBalances[msg.sender] = 0;
-        payable(msg.sender).sendValue(amount);
-        //todo emit
+        payable(msg.sender).sendValue(profitAmount);
+        emit GameBenefitsWithdrew(msg.sender, profitAmount);
     }
     
     // Getters
 
-    function getCreator(uint256 id) public view returns (address) {
-        return (_gameCreator[id]);
+    function getCreator(uint256 gameId) public view returns (address) {
+        return (_gameCreator[gameId]);
     }
     
     function getCreatorBalance(address creator) public view returns (uint256) {
         return (_creatorBalances[creator]);
     }
     
-    /*function getGameInfos(uint256 id) public view returns (storage) {
-        return (_gameInfos[id]);
-    }*/
+    function isGameRegisteredById(uint256 gameId) public view returns (bool) {
+        return (_isGameRegistered[gameId]);
+    }
     
-    function getPrice(uint256 id) public view returns (uint256) {
-        return (_gamePrice[id]);
+    function getPrice(uint256 gameId) public view returns (uint256) {
+        return (_gamePrice[gameId]);
     }
     
     // Override
@@ -109,4 +120,3 @@ contract GameKeys is ERC721Enumerable, ERC721URIStorage {
         super._burn(tokenId);
     }
 }
-
