@@ -558,6 +558,11 @@
     "@types/sinon-chai" "^3.2.3"
     "@types/web3" "1.0.19"
 
+"@openzeppelin/contracts@^4.3.0":
+  "integrity" "sha512-+uBDl/TrmR0Kch6mq3tuxMex/fK7huR6+fQMae+zJk1K5T+dp0pFl12Hbc+1L6oYMXoyDSBJ8zqhRIntrREDFA=="
+  "resolved" "https://registry.npmjs.org/@openzeppelin/contracts/-/contracts-4.3.0.tgz"
+  "version" "4.3.0"
+
 "@resolver-engine/core@^0.3.3":
   "integrity" "sha512-eB8nEbKDJJBi5p5SrvrvILn4a0h42bKtbCTri3ZxCGt6UvoQyp7HnGOfki944bUjBSHKK3RvgfViHn+kqdXtnQ=="
   "resolved" "https://registry.yarnpkg.com/@resolver-engine/core/-/core-0.3.3.tgz"
@@ -6906,6 +6911,11 @@
   "resolved" "https://registry.yarnpkg.com/node-addon-api/-/node-addon-api-2.0.2.tgz"
   "version" "2.0.2"
 
+"node-bin-setup@^1.0.0":
+  "integrity" "sha512-uPIxXNis1CRbv1DwqAxkgBk5NFV3s7cMN/Gf556jSw6jBvV7ca4F9lRL/8cALcZecRibeqU+5dFYqFFmzv5a0Q=="
+  "resolved" "https://registry.npmjs.org/node-bin-setup/-/node-bin-setup-1.0.6.tgz"
+  "version" "1.0.6"
+
 "node-environment-flags@1.0.6":
   "integrity" "sha512-5Evy2epuL+6TM0lCQGpFIj6KwiEsGh1SrHUhTbNX+sLbBtjidPZFAnVK9y5yU1+h//RitLbRHTIMyxQPtxMdHw=="
   "resolved" "https://registry.yarnpkg.com/node-environment-flags/-/node-environment-flags-1.0.6.tgz"
@@ -6965,6 +6975,13 @@
     "url" "^0.11.0"
     "util" "^0.11.0"
     "vm-browserify" "^1.0.1"
+
+"node@^16.6.1":
+  "integrity" "sha512-qlIQ5vkAAMP+T1bYivwngIqZlUzerPSeaeAQVUvyQ2XZ8WN86ZUdzcpkW/iuEnP9paNcpAsA4p9yCsfrdjG7YQ=="
+  "resolved" "https://registry.npmjs.org/node/-/node-16.6.1.tgz"
+  "version" "16.6.1"
+  dependencies:
+    "node-bin-setup" "^1.0.0"
 
 "normalize-package-data@^2.3.2":
   "integrity" "sha512-/5CMN3T0R4XTj4DcGaexo+roZSdSFW/0AOOTROrjxzCG1wrWXEsGbRKevjlIL+ZDE4sZlJr5ED4YW0yqmkK+eA=="
