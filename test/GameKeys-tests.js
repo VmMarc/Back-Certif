@@ -46,6 +46,7 @@ describe('GameKeys', function () {
   });
 
   describe('Function registerNewGame', function () {
+    let tx;
     beforeEach(async function () {
       await gamekeys.connect(admin).addGameCreator(gameCreator1.address);
       await gamekeys.connect(gameCreator1).registerNewGame('Snake', 'https://snake.com/png', 'blablabla', 5);
@@ -57,6 +58,15 @@ describe('GameKeys', function () {
     it('Should register new game', async function () {
       expect(await gamekeys.isGameRegisteredById(1)).to.be.true;
     });
+    it('Should emit NewGameRegistered event', async function () {
+      tx = await gamekeys.connect(gameCreator1).registerNewGame('PacMan', 'https://pacman.com/png', 'hello pacman', 6);
+      await expect(tx).to.emit(gamekeys, 'NewGameRegistered').withArgs(gameCreator1.address, 2, 6 * RATE);
+    });
+    it('Should revert if game already exists', async function () {
+      await gamekeys.connect(admin).addGameCreator(gameCreator2.address);
+      tx = gamekeys.connect(gameCreator2).registerNewGame('Snake', 'https://snake.gc2.com/png', 'blabliblo', 4);
+      await expect(tx).to.revertedWith('GameKeys: This Game already exists');
+    });
     it('Should return the right struct of the game', async function () {
       const game = await gamekeys.connect(user1).getGameInfosById(1);
       expect(game.title).to.equal('Snake');
@@ -67,9 +77,9 @@ describe('GameKeys', function () {
       // todo date
       // todo gameHash
     });
-    // todo unique game check
   });
   describe('Function BuyGame', async function () {
+    let tx;
     beforeEach(async function () {
       await gamekeys.connect(admin).addGameCreator(gameCreator2.address);
       await gamekeys.connect(gameCreator2).registerNewGame('Mario', 'https://mario.com/png', 'blabliblou', 3);
@@ -89,8 +99,21 @@ describe('GameKeys', function () {
       await gamekeys.connect(user2).buyGame(2, { value: ethers.utils.parseEther('0.005') });
       expect(await gamekeys.balanceOf(user2.address)).to.equal(1);
     });
+    it('Should emit GameBought event', async function () {
+      tx = await gamekeys.connect(user1).buyGame(2, { value: ethers.utils.parseEther('0.005') });
+      await expect(tx).to.emit(gamekeys, 'GameBought').withArgs(user1.address, 2, 1, 5 * RATE);
+    });
+    it('Should revert if game is not registered', async function () {
+      tx = gamekeys.connect(user2).buyGame(3, { value: ethers.utils.parseEther('0.006') });
+      await expect(tx).to.revertedWith('GameKeys: Sorry this game does not exists');
+    });
+    it('Should revert if msg.value not enough', async function () {
+      tx = gamekeys.connect(user2).buyGame(1, { value: ethers.utils.parseEther('0.002') });
+      await expect(tx).to.revertedWith('GameKeys: Sorry not enought ethers');
+    });
   });
   describe('Function Withdraw', async function () {
+    let tx, user1AddressTLC, GAME_CREATOR_ROLE;
     beforeEach(async function () {
       await gamekeys.connect(admin).addGameCreator(gameCreator2.address);
       await gamekeys.connect(gameCreator2).registerNewGame('Mario', 'https://mario.com/png', 'blabliblou', 3);
@@ -106,6 +129,20 @@ describe('GameKeys', function () {
       await expect(() => gamekeys.connect(gameCreator2).withdraw())
         .to.changeEtherBalance(gameCreator2, (await ethers.utils.parseEther('0.008')));
       expect(await gamekeys.connect(gameCreator2).getCreatorBalance(gameCreator2.address)).to.equal(0);
+    });
+    it('Should revert if function is not called by GAME_CREATOR_ROLE', async function () {
+      GAME_CREATOR_ROLE = ethers.utils.id('GAME_CREATOR_ROLE');
+      user1AddressTLC = (user1.address).toLowerCase();
+      tx = gamekeys.connect(user1).withdraw();
+      await expect(tx)
+        .to
+        .revertedWith(
+          `AccessControl: account ${user1AddressTLC} is missing role ${GAME_CREATOR_ROLE}`);
+    });
+    it('Should revert if no balances to withdraw', async function () {
+      await gamekeys.connect(admin).addGameCreator(gameCreator1.address);
+      tx = gamekeys.connect(gameCreator1).withdraw();
+      await expect(tx).to.revertedWith('GameKeys: Sorry balances are empty, nothing to withdraw');
     });
   });
 });
