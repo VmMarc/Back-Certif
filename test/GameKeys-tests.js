@@ -59,7 +59,7 @@ describe('GameKeys', function () {
       expect(await gamekeys.isGameRegisteredById(1)).to.be.true;
     });
     it('Should emit NewGameRegistered event', async function () {
-      tx = await gamekeys.connect(gameCreator1).registerNewGame('PacMan', 'https://pacman.com/png', 'hello pacman', 6);
+      tx = gamekeys.connect(gameCreator1).registerNewGame('PacMan', 'https://pacman.com/png', 'hello pacman', 6);
       await expect(tx).to.emit(gamekeys, 'NewGameRegistered').withArgs(gameCreator1.address, 2, 6 * RATE);
     });
     it('Should revert if game already exists', async function () {
@@ -100,7 +100,7 @@ describe('GameKeys', function () {
       expect(await gamekeys.balanceOf(user2.address)).to.equal(1);
     });
     it('Should emit GameBought event', async function () {
-      tx = await gamekeys.connect(user1).buyGame(2, { value: ethers.utils.parseEther('0.005') });
+      tx = gamekeys.connect(user1).buyGame(2, { value: ethers.utils.parseEther('0.005') });
       await expect(tx).to.emit(gamekeys, 'GameBought').withArgs(user1.address, 2, 1, 5 * RATE);
     });
     it('Should revert if game is not registered', async function () {
@@ -129,6 +129,10 @@ describe('GameKeys', function () {
       await expect(() => gamekeys.connect(gameCreator2).withdraw())
         .to.changeEtherBalance(gameCreator2, (await ethers.utils.parseEther('0.008')));
       expect(await gamekeys.connect(gameCreator2).getCreatorBalance(gameCreator2.address)).to.equal(0);
+    });
+    it('Should emit GameBenefitsWithdrew event', async function () {
+      tx = gamekeys.connect(gameCreator2).withdraw();
+      await expect(tx).to.emit(gamekeys, 'GameBenefitsWithdrew').withArgs(gameCreator2.address, 8 * RATE);
     });
     it('Should revert if function is not called by GAME_CREATOR_ROLE', async function () {
       GAME_CREATOR_ROLE = ethers.utils.id('GAME_CREATOR_ROLE');
