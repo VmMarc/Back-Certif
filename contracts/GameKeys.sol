@@ -40,7 +40,7 @@ contract GameKeys is ERC721Enumerable, ERC721URIStorage, AccessControl {
     mapping(bytes32 => uint256) private _gameHash;
 
     // -----------------Events-----------------
-    event GameBenefitsWithdrew(address indexed creator, uint256 gameId, uint256 profitAmount);
+    event GameBenefitsWithdrew(address indexed creator, uint256 profitAmount);
     event GameBought(address indexed buyer, uint256 gameId, uint256 newLicenseId, uint256 price);
     event NewGameRegistered(address indexed creator, uint256 newGameId, uint256 priceInFinney);
     event GameCreatorAdded(address indexed gameCreator);
@@ -96,15 +96,15 @@ contract GameKeys is ERC721Enumerable, ERC721URIStorage, AccessControl {
         emit GameBought(msg.sender, gameId, newLicenseId, price);
     }
 
-    function withdraw(uint256 gameId) public onlyRole(GAME_CREATOR_ROLE){
+    function withdraw() public onlyRole(GAME_CREATOR_ROLE){
         require(
-            msg.sender == _gameInfos[gameId].creator,
-            "GameKeys: Sorry only the game creator can withdraw this balance"
+            _creatorBalances[msg.sender] != 0,
+            "GameKeys: Sorry balances are empty, nothing to withdraw"
         );
         uint256 profitAmount = _creatorBalances[msg.sender];
         _creatorBalances[msg.sender] = 0;
         payable(msg.sender).sendValue(profitAmount);
-        emit GameBenefitsWithdrew(msg.sender, gameId, profitAmount);
+        emit GameBenefitsWithdrew(msg.sender, profitAmount);
     }
 
     /* todo
