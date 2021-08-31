@@ -46,8 +46,6 @@ contract GameKeys is ERC721Enumerable, ERC721URIStorage, AccessControl {
     event GameCreatorAdded(address indexed gameCreator);
     event GameCreatorRevoked(address indexed gameCreator);
 
-    // -----------------modifier---------------
-
     constructor(address admin_) ERC721("GameKeys", "GMK") {
         _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
         _setupRole(ADMIN_ROLE, admin_);
@@ -151,7 +149,7 @@ contract GameKeys is ERC721Enumerable, ERC721URIStorage, AccessControl {
     }
     //End of getters of the struct object by object
 
-    // Try to get all struct ok : 
+    // Try to get all struct : ok
     function getGameInfosById(uint256 gameId) public view returns (Game memory) {
         return (_gameInfos[gameId]);
     }
