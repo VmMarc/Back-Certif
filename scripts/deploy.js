@@ -15,9 +15,9 @@ async function main() {
   const [deployer] = await ethers.getSigners();
   console.log('Deploying contracts with the account:', deployer.address);
 
-  // We get the contract to deploy
+  // Wi get the contract to deploy
   const GameKeys = await hre.ethers.getContractFactory('GameKeys');
-  const gamekeys = await GameKeys.deploy();
+  const gamekeys = await GameKeys.deploy('0x4AF539F51e28b6f6274f44b9219cF25076bd1EE8');
 
   // Attendre que le contrat soit réellement déployé, cad que la transaction de déploiement
   // soit incluse dans un bloc

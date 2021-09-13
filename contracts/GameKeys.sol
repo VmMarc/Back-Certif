@@ -29,7 +29,6 @@ contract GameKeys is ERC721Enumerable, ERC721URIStorage, AccessControl {
     //uint256 private _nbGames; add after deleteGame function added
     address private _admin;
 
-
     Counters.Counter private _gameIds;
     Counters.Counter private _licenseIds;
 
@@ -94,11 +93,8 @@ contract GameKeys is ERC721Enumerable, ERC721URIStorage, AccessControl {
         emit GameBought(msg.sender, gameId, newLicenseId, price);
     }
 
-    function withdraw() public onlyRole(GAME_CREATOR_ROLE){
-        require(
-            _creatorBalances[msg.sender] != 0,
-            "GameKeys: Sorry balances are empty, nothing to withdraw"
-        );
+    function withdraw() public onlyRole(GAME_CREATOR_ROLE) {
+        require(_creatorBalances[msg.sender] != 0, "GameKeys: Sorry balances are empty, nothing to withdraw");
         uint256 profitAmount = _creatorBalances[msg.sender];
         _creatorBalances[msg.sender] = 0;
         payable(msg.sender).sendValue(profitAmount);
@@ -132,21 +128,27 @@ contract GameKeys is ERC721Enumerable, ERC721URIStorage, AccessControl {
     function getTitleById(uint256 gameId) public view returns (string memory) {
         return (_gameInfos[gameId].title);
     }
+
     function getCoverById(uint256 gameId) public view returns (string memory) {
         return (_gameInfos[gameId].cover);
     }
+
     function getCreator(uint256 gameId) public view returns (address) {
         return (_gameInfos[gameId].creator);
     }
+
     function getDescriptionById(uint256 gameId) public view returns (string memory) {
         return (_gameInfos[gameId].description);
     }
+
     function getPrice(uint256 gameId) public view returns (uint256) {
         return (_gameInfos[gameId].price);
     }
+
     function getTimestampById(uint256 gameId) public view returns (uint256) {
         return (_gameInfos[gameId].date);
     }
+
     //End of getters of the struct object by object
 
     // Try to get all struct : ok
@@ -182,6 +184,10 @@ contract GameKeys is ERC721Enumerable, ERC721URIStorage, AccessControl {
         return hasRole(GAME_CREATOR_ROLE, account);
     }
 
+    function gameTotalSupply() public view returns (uint256) {
+        return _gameIds.current();
+    }
+
     /* todo add after deleteGame function added
     function nbGames() public view returns (uint256) {
         return _nbGames.current();
@@ -211,7 +217,6 @@ contract GameKeys is ERC721Enumerable, ERC721URIStorage, AccessControl {
     function _burn(uint256 tokenId) internal virtual override(ERC721URIStorage, ERC721) {
         super._burn(tokenId);
     }
-
 
     function _beforeTokenTransfer(
         address from,
