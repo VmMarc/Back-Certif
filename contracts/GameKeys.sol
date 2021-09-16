@@ -18,6 +18,7 @@ contract GameKeys is ERC721Enumerable, ERC721URIStorage, AccessControl {
         address creator;
         string description;
         uint256 price;
+        uint256 gameID;
         uint256 date;
         bytes32 gameHash;
     }
@@ -74,6 +75,7 @@ contract GameKeys is ERC721Enumerable, ERC721URIStorage, AccessControl {
             msg.sender,
             description,
             priceInFinney,
+            newGameId,
             block.timestamp,
             uniqueGameHash
         );
@@ -186,6 +188,10 @@ contract GameKeys is ERC721Enumerable, ERC721URIStorage, AccessControl {
 
     function gameTotalSupply() public view returns (uint256) {
         return _gameIds.current();
+    }
+
+    function licenceTotalSupply() public view returns (uint256) {
+        return _licenseIds.current();
     }
 
     /* todo add after deleteGame function added
