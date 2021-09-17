@@ -74,8 +74,6 @@ describe('GameKeys', function () {
       expect(game.creator).to.equal(gameCreator1.address);
       expect(game.description).to.equal('blablabla');
       expect(game.price).to.equal(5 * RATE);
-      // expect(game.gameHash).to.equal(ethers.utils.id('Snake'));
-      // todo timestamp
     });
   });
   describe('Function BuyGame', async function () {
